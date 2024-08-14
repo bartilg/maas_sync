@@ -1,0 +1,34 @@
+name: Sync Branches
+
+on:
+  push:
+    branches:
+      - main
+      - private
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge Main to Private
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git checkout private
+          git merge main
+          git push origin private
+
+      - name: Merge Private to Main
+        if: github.ref == 'refs/heads/private'
+        run: |
+          git checkout main
+          git merge private
+          git push origin main
